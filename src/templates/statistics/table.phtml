@@ -1,0 +1,22 @@
+<?php if (!isset($_tableData[0])): ?>
+	<span class="nodata">No data to display</span>
+<?php else: ?>
+<table class="table table-striped table-bordered table-condensed table-hover stats-grid data-table sortable">
+	<thead>
+		<tr>
+		<?php foreach($_tableData[0] as $columnName => $rowData): ?>
+			<th><?php echo JaddleWeb::htmlText($columnName, true) ?></th>
+		<?php endforeach; ?>
+		</tr>
+	</thead>
+	<tbody>
+	<?php foreach($_tableData as $rowData): ?>
+		<tr>
+		<?php foreach($rowData as $columnName => $cellData): ?>
+			<td><?php echo JaddleWeb::htmlText($cellData) ?></td>
+		<?php endforeach; ?>
+		</tr>
+	<?php endforeach; ?>
+	</tbody>
+</table>
+<?php endif; ?>

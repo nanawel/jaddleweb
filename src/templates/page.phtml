@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><?php echo $this->getPageTitle() ?></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+    <!-- Specific JS/CSS -->
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="js/sorttable.js"></script>
+  </head>
+<body>
+    <!-- Nav/Header -->
+    <?php include JADDLE_TEMPLATES_DIR . '/header.phtml'; ?>
+
+    <!-- Subheader -->
+    <div class="hero-unit">
+        <?php include JADDLE_TEMPLATES_DIR . '/playing.phtml'; ?>
+    </div>
+
+    <!-- Tracks grid -->
+    <div class="tracksgrid-box-container container-fluid">
+        <div id="tracksgrid-box" class="row-fluid">
+            <?php include JADDLE_TEMPLATES_DIR . '/tracksgrid.phtml'; ?>
+        </div>
+    </div>
+
+    <!-- Loading Box -->
+    <div id="loading-modal" class="modal hide fade" tabindex="-1" role="dialog">
+        <div class="modal-body">
+            <div class="progress progress-striped active">
+                <div class="bar" style="width: 100%;">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="no-user-select">
+        <div class="container">
+            <p>Page rendered in <?php echo $this->getPageExecTime() ?></p>
+            <p class="brand">Jaddle Web UI <small><?php echo $this->getVersion() ?></small></p>
+            <p>Copyleft 2011-2013 Anaël Ollier &lt;<a href="mailto:nanawel@gmail.com?subject=Jaddle">nanawel@gmail.com</a>&gt;</p>
+            <a href="https://twitter.com/nanawel" class="twitter-follow-button" data-show-count="false">Follow @nanawel</a>
+        </div>
+        <?php include JADDLE_TEMPLATES_DIR . '/js.footer.phtml'; ?>
+
+        <?php if ($this->_debugEnabled): ?>
+            <div style="color: #eee; font-weight: bold; font-size: 16px; position: fixed; bottom: 0px; width: 100%; z-index: 2000; background-color: #d11;">[ DEV ]</div>
+        <?php endif; ?>
+    </footer>
+</body>
+</html>

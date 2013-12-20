@@ -1,0 +1,13 @@
+<div class="pagination pagination-centered">
+    <ul>
+        <?php if ($this->getOffset() <= 0): ?>
+    	<li class="disabled"><a href="#"><i class="icon-fast-backward"></i> First page</a></li>
+    	<li class="disabled"><a href="#"><i class="icon-backward"></i> Previous page</a></li>
+        <?php else: ?>
+        <li><a href="<?php echo $this->getGoToPageUrl('first') ?>"><i class="icon-fast-backward"></i> First page</a></li>
+    	<li><a href="<?php echo $this->getGoToPageUrl('previous') ?>"><i class="icon-backward"></i> Previous page</a></li>
+        <?php endif; ?>
+    	<li><a href="<?php echo $this->getGoToPageUrl('next') ?>">Next page <i class="icon-forward"></i></a></li>
+    	<li><a href="<?php echo $this->getGoToPageUrl('last') ?>">Last page <i class="icon-fast-forward"></i></a></li>
+    </ul>
+</div>

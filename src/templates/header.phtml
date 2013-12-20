@@ -1,0 +1,44 @@
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <a class="brand" href="#about-modal" role="button" data-toggle="modal">Jaddle&nbsp;<small><?php echo $this->getVersion() ?></small></a>
+        <ul class="nav nav-about pull-right">
+            <li class=""><span><a href="#stats-modal" role="button" class="btn" data-toggle="modal"><i class="icon-info-sign"></i> Statistics</a></span></li>
+        </ul>
+        <ul class="nav nav-mpd-controls pull-right">
+            <li id="mpdcontrols-title" class="mpdcontrols field"><a href="#">MPD Controls</a></li>
+            <?php include JADDLE_TEMPLATES_DIR . '/header/controls.phtml'; ?>
+        </ul>
+    </div>
+</div>
+
+<!-- About Box -->
+<div id="about-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="about-label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="about-label">About</h3>
+    </div>
+    <div class="modal-body">
+        <p class="lead">Jaddle <small><?php echo $this->getVersion() ?></small></p>
+        <p>Java music plAyer Daemon LoggEr</p>
+        <p>PHP Web UI</p>
+        <p>Copyleft 2011-2013 Anaël Ollier &lt;<a href="mailto:nanawel@gmail.com?subject=Jaddle">nanawel@gmail.com</a>&gt;</p>
+        <a href="https://twitter.com/nanawel" class="twitter-follow-button" data-show-count="false">Follow @nanawel</a>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+<!-- Stats Box -->
+<div id="stats-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="stats-label" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="stats-label">Statistics</h3>
+    </div>
+    <div class="modal-body">
+        <?php include JADDLE_TEMPLATES_DIR . '/header/statistics.phtml'; ?>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>

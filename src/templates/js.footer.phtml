@@ -1,0 +1,282 @@
+<script src="js/jquery-1.10.2.min.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/jquery.lazy.min.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/reflection.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/jwplayer.js" type="text/javascript" charset="UTF-8"></script>
+<script src="js/jwplayer.html5.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript">
+//<![CDATA[
+!function ($) {
+    /* MPD Controls */
+    $('.control-button.next').popover({
+        content: "Use buttons to control MPD.<br/>(You must have <span style=\"font-family: monospace;\"><a href=\"http://mpd.wikia.com/wiki/Client:Mpc\" target=\"_blank\">mpc</a></span> installed on the server)",
+    	placement: 'bottom',
+    	html: true,
+    	trigger: 'manual'
+    });
+    $('#mpdcontrols-title a').click(function(e) {
+    	$(".control-button.next").popover('show');
+    	setTimeout(function() {
+            $(".control-button.next").popover('hide');
+        }, 5000);
+    });
+    $('.control-button').click(function(e) {
+    	$('#loading-modal').modal({
+        	backdrop: 'static',
+        	keyboard: false
+        });
+        window.location = "?c=" + $(e.currentTarget).attr('role');
+    });
+
+    function reloadWithModal() {
+    	$('#loading-modal').modal('show');
+        window.location.reload(false);
+    }
+
+    function updateProgress(p) {
+    	$('.progressbar').css('width', p + '%');
+    }
+
+    /* Track watcher */
+    trackWatcher = {
+	    lastTrackId: <?php echo $this->getCurrentTrackId() ?>,
+        trackWatchInterval: null,
+
+	    start: function() {
+    		this.trackWatchInterval = setInterval(function() {
+    		    $.ajax({
+        		    url: 'index.php?a=trackwatch',
+    		    	dataType: "json",
+    		        success: function(data, textStatus, jqXHR) {
+    		            if (typeof data.progress != "undefined") {
+    		            	updateProgress(parseInt(data.progress));
+    		            }
+    		            if (typeof data.id != "undefined") {
+    		                if (data.id != trackWatcher.lastTrackId) {
+    		                	reloadWithModal();
+    		                }
+    		            }
+    		        }
+    		    });
+    		}, <?php echo (JADDLE_TRACKWATCH_TIMER * 1000) ?>);
+	    },
+
+	    stop: function() {
+    	    clearInterval(this.trackWatchInterval);
+	    },
+    };
+	$(window).load(function() {
+		trackWatcher.start();
+	});
+
+    function reflectCover() {
+        $('#cover-img').reflect({
+            height: 0.4,
+            opacity: 0.5,
+            margin: 4
+        });
+    };
+    function setCoverImage(url) {
+    	$('#cover-img').unreflect();
+    	$('#cover-img').attr('src', url);
+    	reflectCover();
+    };
+
+    <?php $trackDetails = $this->getCurrentTrackDetails() ?>
+    <?php if ($trackDetails): ?>
+    $('#cover-img').lazy({
+        afterLoad: function(el) {
+        	el.attr({
+                width: <?php echo JADDLE_COVER_SIZE ?>,
+                height: <?php echo JADDLE_COVER_SIZE ?>
+            });
+            reflectCover();
+        }
+    });
+    updateProgress(parseInt(<?php echo $trackDetails['progress_percent'] ?>));
+    <?php endif ?>
+
+    /* Cover */
+    $('.cover-img-container').hover(
+        function(e) {
+            $(this).find('.change-cover-btn').show();
+        },
+        function(e) {
+            $(this).find('.change-cover-btn').hide();
+        }
+    );
+
+    coverBrowser = {
+    	trackId: <?php echo $this->getCurrentTrackId() ?>,
+
+    	open: function() {
+        	trackWatcher.stop(); //Prevent page reload
+
+    	    $('#coverbrowser-modal').modal({keyboard: true});
+        	this.search();
+    	    $('#coverbrowser-modal').on('hidden', function() {
+    	    	trackWatcher.start();
+    	    });
+    	},
+
+    	search: function(terms) {
+        	var url = 'index.php?a=coverbrowser&tid=' + this.trackId;
+        	if (typeof terms != 'undefined') {
+        	    url += '&s=' + escape(terms);
+        	}
+            $('#coverbrowser-modal .loading').show();
+
+            $('#coverbrowser-modal .covers-grid').remove();
+        	$.ajax({
+    		    url: url,
+		    	dataType: "html",
+		        success: function(data, textStatus, jqXHR) {
+                    $('#coverbrowser-modal .loading').hide();
+		            $('#coverbrowser-modal .modal-body').append(data);
+		        }
+		    });
+    	},
+
+    	apply: function(coverUrl) {
+    	    $.ajax({
+    		    url: 'index.php?a=updatecover&tid=' + this.trackId + '&coverUrl=' + escape(coverUrl),
+		    	dataType: "json",
+		        success: function(data, textStatus, jqXHR) {
+		            if (typeof data.url != "undefined") {
+			            //Force cover refresh
+		                setCoverImage('index.php?i=cover&tid=' + coverBrowser.trackId + '&rand=' + new Date().getTime());
+		            }
+		        }
+		    });
+    	}
+    };
+    $('.change-cover-btn').click(function(e) {
+        coverBrowser.open();
+    });
+    $('#coverbrowser-modal .close-btn').click(function(e) {
+		 $('#coverbrowser-modal').modal('hide');
+    });
+    $('#cover-search-input').keypress(function(ev) {
+        if (ev.which == 13) {
+        	coverBrowser.search($(this).val());
+        }
+    });
+    $('#coverbrowser-modal .apply-btn').click(function(e) {
+    	var sel = $('.covers-grid .selected img');
+    	if (typeof sel[0] != 'undefined') {
+        	if (confirm("Replace current cover with the selection?")) {
+        		 coverBrowser.apply(sel.attr('src'));
+        		 $('#coverbrowser-modal').modal('hide');
+        	}
+    	}
+    	else {
+        	alert("You must select a cover first");
+    	}
+    });
+    $('#coverbrowser-modal .modal-body').on('click', '.covers-grid .cover', function(e) {
+    	$('.covers-grid .selection-box').removeClass('selected');
+        $(this).find('.selection-box').addClass('selected');
+    });
+
+    /* Tooltips */
+    $('.tooltiped').tooltip();
+
+    /* Lyrics */
+    <?php if (JADDLE_LYRICS_MODE == 'full'): ?>
+    lyricsViewer = {
+    	trackId: <?php echo $this->getCurrentTrackId() ?>,
+
+    	open: function() {
+        	trackWatcher.stop(); //Prevent page reload
+
+    	    $('#lyricsviewer-modal').modal({keyboard: true});
+        	this.search();
+    	    $('#lyricsviewer-modal').on('hidden', function() {
+    	    	trackWatcher.start();
+    	    });
+    	},
+
+    	search: function() {
+        	var url = 'index.php?a=lyricsviewer&tid=' + this.trackId;
+            $('#lyricsviewer-modal .loading').show();
+        	$.ajax({
+    		    url: url,
+		    	dataType: "html",
+		        success: function(data, textStatus, jqXHR) {
+                    $('#lyricsviewer-modal .loading').hide();
+
+                    //Need to clean up the response a bit, unfortunately :(
+		            var content = $('<div>' + data + '</div>');
+		            var lyricbox = content.find('.lyricbox');
+		            content.find('a').remove();
+		            $('#lyricsviewer-modal .modal-body').append(lyricbox);
+		        }
+		    });
+    	}
+    };
+    $('#lyricsviewer-modal .close-btn').click(function(e) {
+		 $('#lyricsviewer-modal').modal('hide');
+    });
+    $('.lyricslink').click(function(ev) {
+    	ev.preventDefault();
+    	lyricsViewer.open();
+    	return false;
+    });
+    <?php endif; ?>
+
+}(window.jQuery);
+//]>
+</script>
+
+<!-- JW Player -->
+<script type="text/javascript">
+    jwplayer('player').setup({
+        height: '24',
+        file:   '<?php echo $this->getStreamExternalUrl() ?>',
+        width:  '124px',      // only the "play" and volume buttons
+    });
+    function getPlayerConfig() {
+    	var config = jQuery.cookie("playerConfig");
+        if (typeof config == 'undefined' || config == null) {
+            config = {
+    		   autoplay: 0,
+    		   volume:   50   //not used, JWPlayer has its own cookie
+            };
+        }
+        else {
+            config = JSON.parse(config);
+        }
+        return config;
+    }
+    function setPlayerConfig(newConfig) {
+    	var config = getPlayerConfig();
+    	if (typeof newConfig.autoplay != 'undefined' && newConfig.autoplay != null) {
+    		config.autoplay = newConfig.autoplay ? 1 : 0;
+    	}
+    	if (typeof newConfig.volume != 'undefined' && newConfig.volume != null) {
+    		config.volume = newConfig.volume >= 0 && newConfig.volume <= 100 ? newConfig.volume : 50;
+    	}
+    	jQuery.cookie("playerConfig", JSON.stringify(config), {expires: 30});
+    }
+    jwplayer('player').onPlay(function() {
+    	setPlayerConfig({autoplay: 1});
+    });
+    jwplayer('player').onPause(function() {
+    	setPlayerConfig({autoplay: 0});
+    });
+    jwplayer('player').onVolume(function(v) {
+    	setPlayerConfig({volume: v});
+    });
+    var config = getPlayerConfig();
+    if (config.autoplay == 1) {
+    	jwplayer('player').play(true);
+    }
+</script>
+
+<!-- Twitter button -->
+<script>
+//<![CDATA[
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+//]>
+</script>

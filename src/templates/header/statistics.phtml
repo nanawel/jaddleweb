@@ -1,0 +1,6 @@
+<dl class="statistics-details">
+	<?php foreach($this->getTracksStats() as $label => $value): ?>
+	<dt><label class="label"><?php echo htmlentities(utf8_encode($label)) ?></label></dt>
+	<dd><?php $this->renderStat($label, $value) ?></dd>
+	<?php endforeach; ?>
+</dl>

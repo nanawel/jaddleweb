@@ -1,0 +1,25 @@
+<IfModule mod_expires.c>  
+    ExpiresActive On  
+    ExpiresDefault "access plus 7200 seconds"  
+    ExpiresByType image/jpg             "access plus 1 week"  
+    ExpiresByType image/jpeg            "access plus 1 week"  
+    ExpiresByType image/png             "access plus 1 week"  
+    ExpiresByType image/gif             "access plus 1 week"  
+    AddType image/x-icon .ico  
+    ExpiresByType image/ico             "access plus 1 week"  
+    ExpiresByType image/icon            "access plus 1 week"  
+    ExpiresByType image/x-icon          "access plus 1 week"  
+    ExpiresByType text/css              "access plus 1 week"  
+    ExpiresByType text/javascript       "access plus 1 week"  
+    ExpiresByType text/html             "access plus 7200 seconds"  
+    ExpiresByType application/xhtml+xml     "access plus 7200 seconds"  
+    ExpiresByType application/javascript    "access plus 1 week"  
+    ExpiresByType application/x-javascript  "access plus 1 week"  
+    ExpiresByType application/x-shockwave-flash "access plus 1 week"  
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} (ogg|mp3)$
+    RewriteRule .*\.(.*)$ index.php?s=listen&f=$1 [L]
+</IfModule>

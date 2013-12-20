@@ -1,0 +1,31 @@
+<?php $trackDetails = $this->getCurrentTrackDetails() ?>
+<?php if ($trackDetails): ?>
+    <div class="cover-img-container" style="width: <?php echo JADDLE_COVER_SIZE ?>px; height: <?php echo JADDLE_COVER_SIZE ?>px;">
+        <div class="change-cover-btn icon-th icon-white"></div>
+        <!-- Using jQuery.lazy -->
+        <img id="cover-img" data-src="index.php?i=cover&amp;tid=<?php echo $trackDetails['id'] ?>" src="img/loading.gif" width="24" height="24" alt="Cover" />
+    </div>
+<?php endif ?>
+
+<!-- Cover Browser Box -->
+<div id="coverbrowser-modal" class="modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <div id="cover-search-form">
+        	<label for="cover-search-input">Search using: </label>
+        	<input type="text" class="" name="cover-search" id="cover-search-input" value="<?php echo htmlspecialchars($trackDetails['artist'] . ' ' . $trackDetails['album']) ?>" />
+        </div>
+        <h3>Cover Browser</h3>
+    </div>
+
+    <div class="modal-body">
+        <div class="progress progress-striped active loading">
+            <div class="bar" style="width: 100%;">Loading covers, please wait...</div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn close-btn">Close</a>
+        <a href="#" class="btn btn-primary apply-btn">Apply</a>
+    </div>
+</div>

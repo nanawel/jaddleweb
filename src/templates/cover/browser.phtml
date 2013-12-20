@@ -1,0 +1,11 @@
+<div class="covers-grid">
+    <?php foreach($this->getAllCovers(null, $terms) as $coverData): ?>
+    <div class="cover">
+        <div class="selection-box">
+            <i class="icon-ok-sign icon"></i>
+            <img src="<?php echo $coverData['url'] ?>" width="<?php echo $coverData['width'] ?>" height="<?php echo $coverData['height'] ?>" />
+            <p class="cover-detail"><?php echo $coverData['alt'] ?></p>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
